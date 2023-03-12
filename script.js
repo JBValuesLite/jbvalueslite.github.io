@@ -6,23 +6,9 @@ function switchToHypers() {
         card.style.display = "none";
     })
 
-    addCard("Hyper Red LVL5", "color", "", "4 Torpedos")
-    addCard("Hyper Green LVL5", "color", "", "3 Torpedos + Beam")
-    addCard("Hyper Blue LVL5", "color", "", "3 Torpedos + Arachnid")
-    addCard("Hyper Pink LVL5", "color", "", "2 Torpedos + Icebreaker")
-    addCard("Hyper Diamond LVL5", "color", "", "2 Torpedos + Brulee")
-    addCard("Hyper Purple LVL5", "color", "", "2 Torpedos")
-    addCard("Hyper Orange LVL5", "color", "", "Torpedo + Checker")
-    addCard("Hyper Yellow LVL5", "color", "", "Torpedo + Icebreaker")
-
-    addCard("Red Lvl 4", "color", "",	"2 Torpedos")
-    addCard("Green Lvl 4", "color", "",	"Torpedo + Arachnid")
-    addCard("Blue Lvl 4", "color", "",	"Torpedo + Checker")
-    addCard("Pink Lvl 4", "color", "",	"Torpedo + Concept")
-    addCard("Diamond Lvl 4", "color", "",	"Torpedo")
-    addCard("Purple Lvl 4", "color", "",	"Beam Hybrid + Javelin")
-    addCard("Orange Lvl 4", "color", "",	"Arachnid")
-    addCard("Yellow Lvl 4", "color", "",	"Checker")
+    const bruh = document.createElement("h1")
+    bruh.textContent = "Coming Soon";
+    parentDiv.appendChild(bruh)
 }  
 
 // bruh moment js (gonna try to make it smaller)
@@ -94,44 +80,40 @@ function addCard(name, type, imageSrc, price) {
 
 window.onload = function () {
     console.log('Loaded bare-bones page');
-    console.log('Loading vehicles...');
     // Load Vehicles
     fetch('https://jbvalues-app.herokuapp.com/itemdata2')
-        .then(response => response.json())
-        .then(data => {
-            const vehicles = data.vehicles;
-            for (const key in vehicles) {
-                const vehicle = vehicles[key];
-                const name = vehicle.name;
-                const type = `(${vehicle.type})`;
-                const image = vehicle.image;
-                const price = "Value: " + vehicle.value;
-                // call your script with name, type, and price as arguments
-                addCard(name, type, image, price);
-            }
+    .then(response => response.json())
+    .then(data => {
+        console.log('Loading vehicles...');
+        const vehicles = data.vehicles;
+        const cosmetics = data.cosmetics;
+        for (const key in vehicles) {
+            const vehicle = vehicles[key];
+            const name = vehicle.name;
+            const type = `(${vehicle.type})`;
+            const image = vehicle.image;
+            const price = "Value: " + vehicle.value;
+            // call your script with name, type, and price as arguments
+            addCard(name, type, image, price);
+        }
+
+        for (const key in cosmetics) {
+            const vehicle = cosmetics[key];
+            const name = vehicle.name;
+            const type = `(${vehicle.type})`;
+            const image = vehicle.image;
+            const price = "Value: " + vehicle.value; // oopsie
+            // call your script with name, type, and price as arguments
+            //cosmeticsCards[name] = [name, type, image, price, false]
+            addCard(name, type, image, price);
+        }
         })
-        .catch(error => console.error(error))
-        .finally(() => console.log("Loaded Vehicles!"));
-    // Load Cosmetics
-    console.log("Loading Cosmetics...");
-    fetch('https://jbvalues-app.herokuapp.com/itemdata2')
-        .then(response => response.json())
-        .then(data => {
-            const cosmetics = data.cosmetics;
-            for (const key in cosmetics) {
-                const vehicle = cosmetics[key];
-                const name = vehicle.name;
-                const type = `(${vehicle.type})`;
-                const image = vehicle.image;
-                const price = "Value: " + vehicle.value; // oopsie
-                // call your script with name, type, and price as arguments
-                //cosmeticsCards[name] = [name, type, image, price, false]
-                addCard(name, type, image, price);
-            }
-        })
-        .catch(error => console.error(error))
-        .finally(() => {
-            hideCosmetics(); // we dont want to show everything at first
-        });
+    .catch(error => console.error(error))
+    .finally(() => {
+        console.log("Loaded Vehicles!");
+        hideCosmetics();
+        console.log("Loaded everything!")
+    });
+    
     console.log("Loaded everything!");
 };
