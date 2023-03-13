@@ -59,24 +59,28 @@ function search(text) {
 // add card dynamically \\
 function addCard(name, type, imageSrc, price) {
     const parentDiv = document.getElementsByClassName('cards')[0];
-    const h1 = document.createElement('h1');
-    const h2 = document.createElement('h2');
-    const img = document.createElement('img');
-    const p = document.createElement('p');
-
+    
     const newDiv = document.createElement('div');
     newDiv.classList.add('card');
-
+    
+    const h1 = document.createElement('h1');
     h1.textContent = name;
     newDiv.appendChild(h1);
-
+    
+    const h2 = document.createElement('h2');
     h2.textContent = type;
     newDiv.appendChild(h2);
+    
+    const imgHolder = document.createElement("div");
+    imgHolder.className = "backHolder";
+    newDiv.appendChild(imgHolder)
 
+    const img = document.createElement('img');
     img.setAttribute('src', imageSrc);
     img.setAttribute('onerror', onerror = "this.onerror=null;this.src='https://a5.behance.net/4cec702805824ada0b02e354d3d29193c8ccdd9c/img/covers/808-blocked.png';")
     newDiv.appendChild(img);
-
+    
+    const p = document.createElement('p');
     p.textContent = price;
     newDiv.appendChild(p);
     parentDiv.appendChild(newDiv);
