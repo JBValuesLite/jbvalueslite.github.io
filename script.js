@@ -1,18 +1,21 @@
 let everything = new Array();
 
+function hideSoonText() {
+    const soonText = document.querySelector(".soonText");
+    soonText.style.display = "none";
+}
+
 function switchToHypers() {
     const parentDiv = document.getElementsByClassName('cards')[0];
     document.querySelectorAll(".cards .card").forEach(card => {
         card.style.display = "none";
     })
-
-    const bruh = document.createElement("h1")
-    bruh.textContent = "Coming Soon";
-    parentDiv.appendChild(bruh)
+    document.querySelector(".soonText").style.display = "block";
 }  
 
 // bruh moment js (gonna try to make it smaller)
 function hideCosmetics() {
+    hideSoonText()
     const cards = document.querySelectorAll('.cards .card'); // get all card elements within the "cards" div
     document.getElementsByClassName("filter")[0].value = "";
     cards.forEach(card => {
@@ -25,6 +28,7 @@ function hideCosmetics() {
 }
 
 function hideVehicles() {
+    hideSoonText()
     const cards = document.querySelectorAll('.cards .card'); // get all card elements within the "cards" div
     document.getElementsByClassName("filter")[0].value = "";
     cards.forEach(card => {
@@ -111,6 +115,7 @@ window.onload = function () {
     .catch(error => console.error(error))
     .finally(() => {
         console.log("Loaded Vehicles!");
+        hideSoonText();
         hideCosmetics();
         console.log("Loaded everything!")
     });
