@@ -1,4 +1,14 @@
-let everything = new Array();
+var selected = 1;
+var history = [0, 0]; // vehicles | cosmetics
+
+function filterCallback(sent) {
+    if (selected == 1) {
+        history[0] = sent;
+    }
+    if (selected == 2) {
+        history[1] = sent;
+    }
+}
 
 function hideSoonText() {
     const soonText = document.querySelector(".soonText");
@@ -6,6 +16,7 @@ function hideSoonText() {
 }
 
 function switchToHypers() {
+    selected = 3;
     const parentDiv = document.getElementsByClassName('cards')[0];
     document.querySelectorAll(".cards .card").forEach(card => {
         card.style.display = "none";
@@ -13,11 +24,36 @@ function switchToHypers() {
     document.querySelector(".soonText").style.display = "block";
 }  
 
+function reloadVehicles() {
+    for (vehicle in Object.keys(vehiclesList)) {
+        const actualVehicle = Object.keys(vehiclesList)[vehicle];
+        var actual = vehiclesList[actualVehicle]
+        
+        addCard(actual.name, actual.type, actual.image, actual.price) 
+    }
+}
+
+function reloadCosmetics() {
+    for (cosmetic in Object.keys(cosmeticsList)) {
+        const actualCosmetic = Object.keys(cosmeticsList)[cosmetic];
+        const actual = cosmeticsList[actualCosmetic];
+
+        addCard(actual.name, actual.type, actual.image, actual.price)
+    }
+}
+
 // bruh moment js (gonna try to make it smaller)
 function hideCosmetics() {
-    hideSoonText()
-    const cards = document.querySelectorAll('.cards .card'); // get all card elements within the "cards" div
-    document.getElementsByClassName("filter")[0].value = "";
+    selected = 1; 
+    const cards = document.querySelectorAll('.cards .card');
+    document.querySelector('.filterDrop').selectedIndex = history[0];
+
+    hideSoonText();
+
+
+    reloadVehicles(); // actual functionality
+
+
     cards.forEach(card => {
         if (!card.querySelector('h2').textContent.includes("(Vehicle)")) {
             card.style.display = "none";
@@ -25,12 +61,19 @@ function hideCosmetics() {
             card.style.display = "block";
         }
     });
+
+    sortCards(history[0])
 }
 
 function hideVehicles() {
-    hideSoonText()
-    const cards = document.querySelectorAll('.cards .card'); // get all card elements within the "cards" div
-    document.getElementsByClassName("filter")[0].value = "";
+    selected = 2;
+    const cards = document.querySelectorAll('.cards .card');
+    document.querySelector('.filterDrop').selectedIndex = history[1];
+    
+    hideSoonText();
+
+    reloadCosmetics(); // actual functionality (too)
+
     cards.forEach(card => {
         if (card.querySelector('h2').textContent.includes("(Vehicle)")) {
             card.style.display = "none";
@@ -38,23 +81,36 @@ function hideVehicles() {
             card.style.display = "block";
         }
     });
+    
+    sortCards(history[1])
 }
 
 function search(text) {
-    const cards = document.querySelectorAll('.cards .card'); // get all card elements within the "cards" div
+    const cards = document.querySelectorAll('.cards .card');
     if (document.getElementsByClassName("filter")[0].value.length === 0) {
         document.getElementsByClassName("filter")[0].value = "";
     }
     cards.forEach(card => {
-        const h1 = card.querySelector('h1'); // get the h1 element within the card
-        const h1Text = h1.textContent.trim(); // get the text content of the h1 element
-        if (!h1Text.toLowerCase().includes(text.toLowerCase())) { // check if the h1 text does not include the search text (case-insensitive)
-            card.style.display = 'none'; // hide the card
-        } else {
-            card.style.display = 'block'; // show the card (in case it was previously hidden)
+        const h1 = card.querySelector('h1').textContent.trim(); // get the text content of the h1 element
+        const h2 = card.querySelector('h2').textContent.trim();
+
+        if (selected == 1 && h2 == "(Vehicle)") {
+            if (!h1.toLowerCase().includes(text.toLowerCase())) {
+                card.style.display = 'none'; 
+            } else {
+                card.style.display = 'block'; 
+            }
+        }
+        if (selected == 2 && h2 != "(Vehicle)") {
+            if (!h1.toLowerCase().includes(text.toLowerCase())) {
+                card.style.display = 'none'; 
+            } else {
+                card.style.display = 'block'; 
+            }
         }
     });
 }
+
 
 // add card dynamically \\
 function addCard(name, type, imageSrc, price) {
@@ -83,7 +139,55 @@ function addCard(name, type, imageSrc, price) {
     const p = document.createElement('p');
     p.textContent = price;
     newDiv.appendChild(p);
-    parentDiv.appendChild(newDiv);
+    if (!parentDiv.contains(newDiv)) {
+        parentDiv.appendChild(newDiv);
+    } else {
+        newDiv.remove()
+    }
+}
+
+let vehiclesList = {};
+let cosmeticsList = {};
+
+let vehiclesValueList = {};
+let cosmeticsValueList = {};
+
+function addVehicles(data) {
+    const vehicles = data.vehicles;
+
+    for (const key in vehicles) {
+        const vehicle = vehicles[key];
+        const name = vehicle.name;
+        const type = `(${vehicle.type})`;
+        const image = vehicle.image;
+        const price = "Value: " + vehicle.value;
+        // call your script with name, type, and price as arguments
+        // vehiclesList[name] = [type, image, price];
+        //addCard(name, type, image, price);
+        vehiclesList[name] = {'name': name, 'type': type, 'image': image, 'price': price}
+        vehiclesValueList[vehicle.name] = parseInt(vehicle.value.replaceAll(",", ""));
+    }
+}
+
+function addCosmetics(data) {
+    const cosmetics = data.cosmetics;
+
+
+        for (const key in cosmetics) {
+            const cosmetic = cosmetics[key];
+            var name = cosmetic.name;
+            const type = `(${cosmetic.type})`;
+            // little fix
+            const image = cosmetic.image;
+            var  price = "Value: " + cosmetic.value; // oopsie
+            // call your script with name, type, and price as arguments
+            if (name == "Brickset" && type == "(Rim)"){
+                name = "BricksetRim";
+            }
+            cosmeticsList[name] = {'name': name, 'type': type, 'image': image, 'price': price}
+            cosmeticsValueList[name] = parseInt(cosmetic.value.replaceAll(",", ""));
+            addCard(name, type, image, price);
+        }
 }
 
 window.onload = function () {
@@ -93,29 +197,18 @@ window.onload = function () {
     .then(response => response.json())
     .then(data => {
         console.log('Loading vehicles...');
-        const vehicles = data.vehicles;
-        const cosmetics = data.cosmetics;
-        for (const key in vehicles) {
-            const vehicle = vehicles[key];
-            const name = vehicle.name;
-            const type = `(${vehicle.type})`;
-            const image = vehicle.image;
-            const price = "Value: " + vehicle.value;
-            // call your script with name, type, and price as arguments
-            addCard(name, type, image, price);
-        }
 
-        for (const key in cosmetics) {
-            const vehicle = cosmetics[key];
-            const name = vehicle.name;
-            const type = `(${vehicle.type})`;
-            const image = vehicle.image;
-            const price = "Value: " + vehicle.value; // oopsie
-            // call your script with name, type, and price as arguments
-            //cosmeticsCards[name] = [name, type, image, price, false]
-            addCard(name, type, image, price);
+        addVehicles(data);
+        addCosmetics(data)
+
+        // add vehicle
+        for (vehicle in Object.keys(vehiclesList)) {
+            const actualVehicle = Object.keys(vehiclesList)[vehicle];
+            var actual = vehiclesList[actualVehicle]
+            
+            addCard(actual.name, actual.type, actual.image, actual.price)
         }
-        })
+    })
     .catch(error => console.error(error))
     .finally(() => {
         console.log("Loaded Vehicles!");
@@ -126,3 +219,130 @@ window.onload = function () {
     
     console.log("Loaded everything!");
 };
+
+function hideCards() {
+    document.querySelector('.filter').value = "";
+    document.querySelectorAll(".cards .card").forEach(card => {
+        card.remove()
+    })
+}
+
+function sortCards(sortingType) {
+    if (sortingType === 0) {
+        hideCards();
+        if (selected == 1) {
+            for (vehicle in Object.keys(vehiclesList)) {
+                const actualVehicle = Object.keys(vehiclesList)[vehicle];
+                var actual = vehiclesList[actualVehicle]
+                
+                addCard(actual.name, actual.type, actual.image, actual.price) 
+            }
+        }
+        
+        if (selected == 2) {
+            for (cosmetic in Object.keys(cosmeticsList)) {
+                const actualCosmetic = Object.keys(cosmeticsList)[cosmetic];
+                const actual = cosmeticsList[actualCosmetic];
+
+                addCard(actual.name, actual.type, actual.image, actual.price)
+            }
+        }
+    }
+
+    if (sortingType === 1) {
+        hideCards();
+        if (selected == 1) {
+            for (vehicle in Object.keys(vehiclesList)) {
+                const actualVehicle = Object.keys(vehiclesList).sort()[vehicle];
+                const actual = vehiclesList[actualVehicle]
+                
+                addCard(actual.name, actual.type, actual.image, actual.price)
+            }
+        }
+
+        if (selected == 2) {
+            for (cosmetic in Object.keys(cosmeticsList)) {
+                const actualCosmetic = Object.keys(cosmeticsList).sort()[cosmetic];
+                const actual = cosmeticsList[actualCosmetic];
+
+                addCard(actual.name, actual.type, actual.image, actual.price)
+            }
+        }
+    }
+
+    /**
+     * @TODO FIX SORTING METHOD BECAUSE IT DOESNT INCLUDES WHEN 2 KEYS HAS THE SAME VALUES
+     */
+
+
+    if (sortingType === 2) {
+        hideCards();
+        if (selected == 1) {
+            var final = {}
+            
+            var bruh =  Object.fromEntries(Object.entries(vehiclesValueList).sort(([, valueA], [, valueB]) => valueA - valueB));
+
+            var reversed = Object.entries(bruh).reverse();
+
+            reversed.forEach(e => {
+                final[e[0]] = e[1]
+            })
+
+            Object.keys(final).forEach(name => {
+                const actualVehicle = vehiclesList[name]
+                addCard(actualVehicle.name, actualVehicle.type, actualVehicle.image, actualVehicle.price)
+            })
+        }
+
+        if (selected == 2) {
+            var final = {}
+            
+            var bruh = Object.fromEntries(Object.entries(cosmeticsValueList).sort(([, valueA], [, valueB]) => valueA - valueB));
+            var reversed = Object.entries(bruh).reverse();
+
+            reversed.forEach(e => {
+                final[e[0]] = e[1]
+            })
+
+            Object.keys(final).forEach(name => {
+                const actualCosmetic = cosmeticsList[name]
+                addCard(actualCosmetic.name, actualCosmetic.type, actualCosmetic.image, actualCosmetic.price)
+            })
+        }
+    }
+
+    if (sortingType === 3) {
+        hideCards();
+        if (selected == 1) {
+            var final = {}
+            
+            var bruh = Object.fromEntries(Object.entries(vehiclesValueList).sort(([, valueA], [, valueB]) => valueA - valueB));
+            var reversed = Object.entries(bruh);
+
+            reversed.forEach(e => {
+                final[e[0]] = e[1]
+            })
+
+            Object.keys(final).forEach(name => {
+                const actualVehicle = vehiclesList[name]
+                addCard(actualVehicle.name, actualVehicle.type, actualVehicle.image, actualVehicle.price)
+            })
+        }
+
+        if (selected == 2) {
+            var final = {}
+            
+            var bruh = Object.fromEntries(Object.entries(cosmeticsValueList).sort(([, valueA], [, valueB]) => valueA - valueB));
+            var reversed = Object.entries(bruh);
+
+            reversed.forEach(e => {
+                final[e[0]] = e[1]
+            })
+
+            Object.keys(final).forEach(name => {
+                const actualCosmetic = cosmeticsList[name]
+                addCard(actualCosmetic.name, actualCosmetic.type, actualCosmetic.image, actualCosmetic.price)
+            })
+        }
+    }
+}
