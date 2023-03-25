@@ -256,5 +256,36 @@ button:hover {
     transform: translate(-50%);
 
     background-color: rgb(18, 27, 75);
+    /*background-color: rgba(16, 149, 182, 0.103);*/
+    
     border-radius: 50%;
+}
+
+.filterCards {
+    z-index: 3;
+
+    position: fixed;
+
+    padding: 10px;
+    
+    width: 100px;
+    height: 50px;
+
+    left: 1;
+
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    background-color: white;
+}
+
+.filterDrop {
+    display: flex;
+    position: sticky;
+
+    width: 100px;
+    height: 30px;
+
+    margin-left: -4px;
+
+    border-radius: 12px;
 }
