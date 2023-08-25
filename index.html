@@ -1,42 +1,30 @@
-<html>
-    <head>
-        <meta name="viewport" content="width=100%">
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div class="filterCards">
-            Filter:
-            <select class="filterDrop" onchange="sortCards(selectedIndex); filterCallback(selectedIndex)">
-                <option>None</option>
-                <option>Alphabetical (A-Z)</option>
-                <option>Value (highest to lowest)</option>
-                <option>Value (lowest to highest)</option>
-            </select>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="header">
+        <img class="logo" src="https://jbvalues.com/media/images/Logo.png">
+        <input onkeyup="filter()" type="text" id="search" placeholder="Search">
+        <div class="switcher">
+            <div class="vehicles" onclick="refresh(0)">Vehicles</div>
+            <div class="cosmetics"onclick="refresh(1)">Cosmetics</div>
         </div>
-
-
-        <div class="main">
-
-            <div class="others">
-                <a href="https://jbvalues.com/"><img class="logo1" src="https://jbvalues.com/media/images/Logo.png"></a>
-                <input class="filter" type="text" placeholder="  Search" onkeyup="search(document.getElementsByClassName('filter')[0].value)">
-            </div>
-
-            <div class="selection">
-                <button onclick="hideCosmetics()">Vehicles</button> |
-                <button onclick="hideVehicles()">Cosmetics</button>|
-                <button onclick="switchToHypers()">Hypers</button> |
-                <div class="socials">
-                    <a href="https://discord.gg/Z2yHMSKCv5"><img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"></a>
-                    <a href="https://twitter.com/jailbreakvalues"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Twitter-logo.svg/1245px-Twitter-logo.svg.png"></a>
-                    
-                </div>
-            </div>
-        </div>
-        <br> <br> <br>
-        <div class="cards">
-            <h1 class="soonText">Coming Soon</h1>
-        </div>
-    </body>
-    <script src="script.js"></script>
+        <select class="filter" onchange="filter_cards()">
+            <option value="no">No Filters</option>
+            <option value="alphabetical">Alphabetical</option>
+            <option value="lowest">Low to High</option>
+            <option value="highest">High to Low</option>
+            <option value="demand">High demand to low</option>
+        </select>
+        <div class="bruleeButton" onclick="switchToBrulee()"><img src="https://media.discordapp.net/attachments/1005873955632066590/1005874328501506068/New_Project_49.png"></div>
+    </div>
+    <div class="display">Vehicles</div>
+    <div class="cards"></div>
+</body>
+<script src="./script.js"></script>
 </html>
