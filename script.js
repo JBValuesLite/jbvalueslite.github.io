@@ -3,9 +3,16 @@ const cardsDiv = document.querySelector(".cards");
 
 var vehicles;
 var cosmetics;
+var all;
+
+const buttons = {
+  "all":document.querySelector('.all'), 
+  "vehicles":document.querySelector(".vehicles"),
+  "cosmetics":document.querySelector('.cosmetics')  
+};
 
 var selected = 0;
-var display = "Vehicles";
+var display = "All";
 
 function removeAll() {
     cardsDiv.querySelectorAll(".card").forEach(c => {c.remove()})
@@ -31,19 +38,29 @@ function createCard(element) {
 
 function refresh(index) {
     document.querySelector(".filter").value="no";
-
+    //https://jbvalues-app.herokuapp.com/itemdata2
     fetch("https://jbvalues-app.herokuapp.com/itemdata2").then(result=>result.json()).then(response=>{
         vehicles = response.vehicles;
         cosmetics = response.cosmetics;
-    
+        all = {...vehicles, ...cosmetics}
+        
         if (index == 0) {
+          removeAll()
+          for (const key in all) {
+              const element = all[key];
+              createCard(element)
+          }
+          display = "All";
+        }
+        if (index == 1) {
             removeAll()
             for (const key in vehicles) {
                 const element = vehicles[key];
+                
                 createCard(element)
             }
             display = "Vehicles";
-        } else if (index == 1) {
+        } else if (index == 2) {
             removeAll()
             for (const key in cosmetics) {
                 const element = cosmetics[key];
@@ -51,8 +68,13 @@ function refresh(index) {
             }
             display = "Cosmetics";
         }
-
+        selected = index;
         document.querySelector(".display").textContent = display;
+        
+        document.querySelectorAll('.switcherButton').forEach(button => {
+            button.classList.remove("selected")
+        })
+        Object.values(buttons)[selected].classList.add("selected")
     })
 }
 
@@ -94,6 +116,9 @@ function filter_cards() {
     const cards = Array.from(cardsContainer.getElementsByClassName('card'));
 
     switch (filterOption) {
+        case 'no':
+          refresh(selected)
+          break;
         case 'alphabetical':
             cards.sort((a, b) => {
                 const nameA = a.querySelector('#name').textContent.toLowerCase();
